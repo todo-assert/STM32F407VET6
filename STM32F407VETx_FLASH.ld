@@ -131,6 +131,16 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >FLASH
 
+  /* lcd info */
+  .lcd_info :
+  {
+    . = ALIGN(4);
+	__lcd_info_begin = .;
+	KEEP(*(.lcd_info_*))
+	__lcd_info_end = .;
+    . = ALIGN(4);
+  } >FLASH
+  
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 

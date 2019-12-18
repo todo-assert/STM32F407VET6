@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "lcd.h"
 #include "fatfs.h"
 #include "libjpeg.h"
 
@@ -95,6 +96,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FSMC_Init();
+  lcd_probe();
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
@@ -216,6 +218,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  
+  
+	GPIO_InitStruct.Pin=GPIO_PIN_12|GPIO_PIN_6;
+	
+	GPIO_InitStruct.Mode=GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull=GPIO_PULLUP;
+	GPIO_InitStruct.Speed=GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOD,&GPIO_InitStruct); 
+	
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+	
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_RESET);
+	HAL_Delay(300);
+	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
+	HAL_Delay(320);
 
 }
 
