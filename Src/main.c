@@ -45,6 +45,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 
 SRAM_HandleTypeDef hsram1;
 
@@ -57,6 +58,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_FSMC_Init(void);
 static void MX_USB_OTG_FS_USB_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -65,6 +67,25 @@ static void MX_USB_OTG_FS_USB_Init(void);
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
+
+struct __FILE 
+{ 
+	int handle; 
+}; 
+
+FILE __stdout; 
+
+void _sys_exit(int x) 
+{ 
+	x = x; 
+}
+
+int fputc(int ch, FILE *f)
+{ 	
+  while((USART1->SR&0X40)==0); 
+  USART1->DR = (uint8_t) ch;      
+  return ch;
+}
 
 /**
   * @brief  The application entry point.
@@ -100,8 +121,9 @@ int main(void)
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  printf("Initial\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -160,6 +182,40 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+
+/**
   * @brief USB_OTG_FS Initialization Function
   * @param None
   * @retval None
@@ -192,6 +248,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
@@ -219,7 +276,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   
+  GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
   
+  GPIO_InitStruct.Alternate = 0;
 	GPIO_InitStruct.Pin=GPIO_PIN_12|GPIO_PIN_6;
 	
 	GPIO_InitStruct.Mode=GPIO_MODE_OUTPUT_PP;
