@@ -68,23 +68,23 @@ static void MX_USART1_UART_Init(void);
 
 /* USER CODE END 0 */
 
-struct __FILE 
-{ 
-	int handle; 
-}; 
-
-FILE __stdout; 
-
-void _sys_exit(int x) 
-{ 
-	x = x; 
-}
-
-int fputc(int ch, FILE *f)
+int _write(int fd, char *ptr, int len)
 { 	
-  while((USART1->SR&0X40)==0); 
-  USART1->DR = (uint8_t) ch;      
-  return ch;
+  int i = 0;
+  if(fd > 2) {
+    return -1;
+  }
+  while(*ptr && (i<len)) {
+    while((USART1->SR&0X40)==0); 
+    USART1->DR = (uint8_t) *ptr;
+    if(*ptr == '\n') {
+      while((USART1->SR&0X40)==0); 
+      USART1->DR = (uint8_t) '\r';
+    }
+    i++;
+    ptr++;
+  }  
+  return i;
 }
 
 /**
@@ -117,13 +117,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_FSMC_Init();
+  MX_USART1_UART_Init();
+  printf("Initial\n");
   lcd_probe();
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
-  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  printf("Initial\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -196,6 +196,7 @@ static void MX_USART1_UART_Init(void)
   /* USER CODE BEGIN USART1_Init 1 */
 
   /* USER CODE END USART1_Init 1 */
+  __HAL_RCC_USART1_CLK_ENABLE();
   huart1.Instance = USART1;
   huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
@@ -281,20 +282,24 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
   
+  GPIO_InitStruct.Pin = GPIO_PIN_13 | GPIO_PIN_14;
+  GPIO_InitStruct.Alternate = GPIO_AF0_SWJ;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  
   GPIO_InitStruct.Alternate = 0;
-	GPIO_InitStruct.Pin=GPIO_PIN_12|GPIO_PIN_6;
-	
-	GPIO_InitStruct.Mode=GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull=GPIO_PULLUP;
-	GPIO_InitStruct.Speed=GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(GPIOD,&GPIO_InitStruct); 
-	
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
-	
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_RESET);
-	HAL_Delay(300);
-	HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
-	HAL_Delay(320);
+  GPIO_InitStruct.Pin=GPIO_PIN_12|GPIO_PIN_6;
+  
+  GPIO_InitStruct.Mode=GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull=GPIO_PULLUP;
+  GPIO_InitStruct.Speed=GPIO_SPEED_HIGH;
+  HAL_GPIO_Init(GPIOD,&GPIO_InitStruct); 
+  
+  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+  
+  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_RESET);
+  HAL_Delay(300);
+  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_SET);
+  HAL_Delay(320);
 
 }
 
@@ -332,16 +337,16 @@ static void MX_FSMC_Init(void)
   hsram1.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
   hsram1.Init.PageSize = FSMC_PAGE_SIZE_NONE;
   /* Timing */
-  Timing.AddressSetupTime = 15;
-  Timing.AddressHoldTime = 15;
-  Timing.DataSetupTime = 255;
-  Timing.BusTurnAroundDuration = 15;
-  Timing.CLKDivision = 16;
-  Timing.DataLatency = 17;
+  Timing.AddressSetupTime = 0; // 15;
+  Timing.AddressHoldTime = 0; // 15;
+  Timing.DataSetupTime = 0; // 255;
+  Timing.BusTurnAroundDuration = 0; // 15;
+  Timing.CLKDivision = 0; // 16;
+  Timing.DataLatency = 0; // 17;
   Timing.AccessMode = FSMC_ACCESS_MODE_A;
   /* ExtTiming */
 
-  if (HAL_SRAM_Init(&hsram1, &Timing, NULL) != HAL_OK)
+  if (HAL_SRAM_Init(&hsram1, &Timing, &Timing) != HAL_OK)
   {
     Error_Handler( );
   }

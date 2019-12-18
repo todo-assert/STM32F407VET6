@@ -24,9 +24,6 @@ static lcd_resources_t *resource = NULL;
 #define LCD_DIR_RIGHT resource->info->direction_right
 #define LCD_DIR_DOWN resource->info->direction_down
 
-#define __delay_us(n) HAL_Delay(n)
-#define __delay_ms(n) HAL_Delay(n)
-
 typedef enum {
 	SET_ROTATE_0 = 0,
 	SET_ROTATE_90,
@@ -43,21 +40,6 @@ typedef union {
 	};
 }__attribute__((packed)) rgb565_map_t;
 
-#define lcd_read() (LCD_BASE->GRAM)
-#define lcd_wr_reg(r) do{LCD_BASE->REG=r;}while(0)
-#define lcd_wr_data(d) do{LCD_BASE->GRAM=d;}while(0)
-#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);lcd_wr_data(d);}while(0)
-#define lcd_reg_opr(r,p,size) do {\
-		if(p) {\
-			uint16_t *__tmp_p = p;\
-			lcd_wr_reg(r);\
-			while(size--) {\
-				*(__tmp_p++)==lcd_read();\
-				__delay_us(1/*80*/);\
-			}\
-		}\
-	}while(0)
-		
 #define lcd_ram_preparew() do{if(LCD_WRAMCMD) lcd_wr_reg(LCD_WRAMCMD);}while(0)
 #define lcd_ram_preparer() do{if(LCD_RRAMCMD) lcd_wr_reg(LCD_RRAMCMD);}while(0)
 	
@@ -93,7 +75,7 @@ void lcd_set_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 	lcd_reg_opw(LCD_SETYCMD+1, y0&0xff);
 	lcd_reg_opw(LCD_SETYCMD+2, y1>>8);
 	lcd_reg_opw(LCD_SETYCMD+3, y1&0xff);
-	lcd_ram_preparew();
+	// lcd_ram_preparew();
 }
 
 void lcd_set_cursor(uint16_t x0, uint16_t y0) 
@@ -103,10 +85,11 @@ void lcd_set_cursor(uint16_t x0, uint16_t y0)
 		lcd_reg_opw(LCD_XCURSOR+1, x0&0xff);
 		lcd_reg_opw(LCD_YCURSOR+0, y0>>8);
 		lcd_reg_opw(LCD_YCURSOR+1, y0&0xff);
-		lcd_ram_preparew();
+		// lcd_ram_preparew();
 	} else {
-		lcd_set_window(x0, y0, LCD_DISPWID, LCD_DISPHIG);
+		lcd_set_window(x0, y0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	}
+	lcd_ram_preparew();
 }
 
 void lcd_set_direction(direction_set_t dir)
@@ -130,10 +113,11 @@ void lcd_set_direction(direction_set_t dir)
 
 void lcd_clear_window(uint16_t color)
 {
-	uint16_t i, total=LCD_DISPWID*LCD_DISPHIG;
+	uint32_t w, h;
 	lcd_set_cursor(0, 0);
-	for(i=0;i<total;i++) {
-		lcd_wr_data(color);
+	for(w=0;w<LCD_DISPWID;w++) {
+		for(h=0;h<LCD_DISPHIG;h++)
+			lcd_wr_data(color);
 	}
 }
 
@@ -152,17 +136,22 @@ void lcd_init(void)
 
 void lcd_probe(void)
 {
-	resource = __lcd_info_begin;
-	while(resource < __lcd_info_end) {
+	resource = &__lcd_info_begin;
+	while(resource < &__lcd_info_end) {
 		if(resource->probe==NULL) continue;
 		if(resource->probe() == 0) {
 			break;
 		}
 	}
-	// assert(resource >= __lcd_info_end);
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+	assert(resource >= &__lcd_info_end);
 	lcd_init();
+	// lcd_wr_reg(0x2900);
+	// lcd_wr_reg(0x2c00);
+	lcd_set_direction(SET_ROTATE_0);
 	lcd_clear_window(0xF800);
+	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+	printf("\n lcd initial done lcd id = 0x%x\n", resource->info->lcd_id);
+	printf("display window %dx%d\n", LCD_DISPHIG, LCD_DISPWID);
 }
 
 

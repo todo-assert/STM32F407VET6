@@ -14,7 +14,7 @@ typedef struct
 }lcd_base;
 
 #ifndef LCD_BASE
-#define LCD_BASE ((lcd_base *)(0x60000000 | 0x0001FFFE))
+#define LCD_BASE ((volatile lcd_base *)(0x60000000 | 0x0001FFFE))
 #endif
 
 typedef union {
@@ -67,10 +67,27 @@ typedef struct {
 
 extern void lcd_probe(void);
 
-extern lcd_resources_t *__lcd_info_begin;
-extern lcd_resources_t *__lcd_info_end;
+extern lcd_resources_t __lcd_info_begin;
+extern lcd_resources_t __lcd_info_end;
 
 
+#define __delay_us(n) HAL_Delay(n)
+#define __delay_ms(n) HAL_Delay(n)
+
+#define lcd_read() (LCD_BASE->GRAM)
+#define lcd_wr_reg(r) do{LCD_BASE->REG=r;}while(0)
+#define lcd_wr_data(d) do{LCD_BASE->GRAM=d;}while(0)
+#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);lcd_wr_data(d);}while(0)
+#define lcd_reg_opr(r,p,s) do {\
+		uint16_t size = s; \
+		uint16_t *__tmp_p = p;\
+		lcd_wr_reg(r);\
+		while(size--) {\
+			*(__tmp_p++)=lcd_read();\
+			__delay_us(1/*80*/);\
+		}\
+	}while(0)
+		
 
 #define location_lcd_info(name) __attribute__((unused, section(".lcd_info_"#name), aligned(4)))
 

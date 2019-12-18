@@ -441,8 +441,8 @@ const reg_array_t nt35510_init[] = {
 	fill_reg_array(0x3a00, 0x55),  ////55=16bit/////66=18bit
 	fill_reg_array(0x1100, 0),
 	fill_reg_array(DELAY_INSERT_FLAG,120),
-	fill_reg_array(0x2900, 0), 
-	fill_reg_array(0x2c00, 0),
+	fill_reg_array(0x2900, 0xFFFF), 
+	fill_reg_array(0x2c00, 0xFFFF),
 };
 
 const reg_map_t nt35510_reg_map[1] = {
@@ -477,6 +477,32 @@ lcd_init_config(nt35510, nt35510_init, nt35510_reg_map, nt35510_disp_info)
 {
 	int ret = -1;
 	ret = 0;
+	printf("nt35510_init = %p\n", nt35510_init);
+	printf("nt35510_reg_map = %p\n", nt35510_reg_map);
+	printf("nt35510_disp_info = %p\n", nt35510_disp_info);
+	
+	uint16_t val;
+	lcd_wr_reg(0xF000);
+	lcd_wr_data(0x55);
+	lcd_wr_reg(0xF001);
+	lcd_wr_data(0xAA);
+	lcd_wr_reg(0xF002);
+	lcd_wr_data(0x52);
+	lcd_wr_reg(0xF003);
+	lcd_wr_data(0x08);
+	lcd_wr_reg(0xF004);
+	lcd_wr_data(0x01);
+
+	lcd_wr_reg(0xC500);
+	val = lcd_read()<<8;
+	lcd_wr_reg(0xC501);
+	val <<= 8;
+	val |= lcd_read();
+    // lcd_reg_opr(0xC500,&tmp,1);
+	// val <<= 8;
+	// lcd_reg_opr(0xC501,&tmp,1);	
+	// val |= tmp;
+	printf("lcd id get = %x\n", val);
 	
 	return ret;
 }
