@@ -400,7 +400,7 @@ const reg_array_t nt35510_init[] = {
 	fill_reg_array(0xB004, 0x02),
 	//## SDT:
 	fill_reg_array(0xB600, 0x08),
-	fill_reg_array(0xB500, 0x50),//0x6b ???? 480x854       0x50 ???? 480x800
+	fill_reg_array(0xB500, 0x50),//0x6b 480x854       0x50 480x800
 
 	//## Gate EQ:
 	fill_reg_array(0xB700, 0x00),
@@ -439,7 +439,7 @@ const reg_array_t nt35510_init[] = {
 	fill_reg_array(0x3500, 0x00),
 	fill_reg_array(0x3600, 0x00),
 	fill_reg_array(0x3a00, 0x55),  ////55=16bit/////66=18bit
-	fill_reg_array(0x1100, 0),
+	fill_reg_array(0x1100, 0xFFFF),
 	fill_reg_array(DELAY_INSERT_FLAG,120),
 	fill_reg_array(0x2900, 0xFFFF), 
 	fill_reg_array(0x2c00, 0xFFFF),
@@ -456,7 +456,7 @@ const reg_map_t nt35510_reg_map[1] = {
 	}
 };
 
-const lcd_info_t nt35510_disp_info[1] = {
+lcd_info_t nt35510_disp_info[1] = {
 	{
 		.lcd_width = 480,
 		.lcd_hight = 800,
@@ -476,10 +476,6 @@ const lcd_info_t nt35510_disp_info[1] = {
 lcd_init_config(nt35510, nt35510_init, nt35510_reg_map, nt35510_disp_info)
 {
 	int ret = -1;
-	ret = 0;
-	printf("nt35510_init = %p\n", nt35510_init);
-	printf("nt35510_reg_map = %p\n", nt35510_reg_map);
-	printf("nt35510_disp_info = %p\n", nt35510_disp_info);
 	
 	uint16_t val;
 	lcd_wr_reg(0xF000);
@@ -494,15 +490,14 @@ lcd_init_config(nt35510, nt35510_init, nt35510_reg_map, nt35510_disp_info)
 	lcd_wr_data(0x01);
 
 	lcd_wr_reg(0xC500);
-	val = lcd_read()<<8;
+	__delay_ms(1);
+	val = lcd_read();
 	lcd_wr_reg(0xC501);
+	__delay_ms(1);
 	val <<= 8;
 	val |= lcd_read();
-    // lcd_reg_opr(0xC500,&tmp,1);
-	// val <<= 8;
-	// lcd_reg_opr(0xC501,&tmp,1);	
-	// val |= tmp;
 	printf("lcd id get = %x\n", val);
+	ret = nt35510_disp_info->lcd_id == val ? 0:-1;
 	
 	return ret;
 }

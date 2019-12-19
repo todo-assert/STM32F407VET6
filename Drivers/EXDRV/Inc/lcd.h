@@ -61,7 +61,7 @@ typedef struct {
 	const reg_array_t *array;
 	uint32_t array_length;
 	const reg_map_t *map;
-	const lcd_info_t *info;
+	lcd_info_t *info;
 	int (*probe) (void);
 }lcd_resources_t;
 
@@ -71,13 +71,13 @@ extern lcd_resources_t __lcd_info_begin;
 extern lcd_resources_t __lcd_info_end;
 
 
-#define __delay_us(n) HAL_Delay(n)
+#define __delay_us(n) // HAL_Delay(n)
 #define __delay_ms(n) HAL_Delay(n)
 
 #define lcd_read() (LCD_BASE->GRAM)
 #define lcd_wr_reg(r) do{LCD_BASE->REG=r;}while(0)
 #define lcd_wr_data(d) do{LCD_BASE->GRAM=d;}while(0)
-#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);lcd_wr_data(d);}while(0)
+#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);asm("nop");lcd_wr_data(d);}while(0)
 #define lcd_reg_opr(r,p,s) do {\
 		uint16_t size = s; \
 		uint16_t *__tmp_p = p;\

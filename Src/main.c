@@ -118,7 +118,7 @@ int main(void)
   MX_GPIO_Init();
   MX_FSMC_Init();
   MX_USART1_UART_Init();
-  printf("Initial\n");
+  printf("\n\nInitial\n");
   lcd_probe();
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();

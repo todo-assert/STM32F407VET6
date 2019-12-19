@@ -22,7 +22,7 @@ TARGET = STM32F407VET6
 # debug build?
 DEBUG = 1
 # optimization
-OPT = -Og
+OPT = -Os
 
 
 #######################################
