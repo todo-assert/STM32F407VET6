@@ -68,6 +68,7 @@ typedef struct {
 }lcd_resources_t;
 
 extern void lcd_probe(void);
+extern void lcd_clear_window(uint16_t color);
 
 extern lcd_resources_t __lcd_info_begin;
 extern lcd_resources_t __lcd_info_end;

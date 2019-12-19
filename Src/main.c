@@ -93,6 +93,7 @@ int _write(int fd, char *ptr, int len)
   */
 int main(void)
 {
+  uint16_t i;
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -131,7 +132,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    for(i=0;i<0xFFFF;i++) {
+      lcd_clear_window(i);	
+    }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
