@@ -7,6 +7,7 @@
 #include "color.h"
 
 #define USE_LCD_NT35510 1
+#define USE_LCD_HX8357A_3P2 1
 
 typedef struct
 {

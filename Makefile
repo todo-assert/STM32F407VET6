@@ -64,6 +64,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c \
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/EXDRV/Src/lcd.c \
 Drivers/EXDRV/Src/nt35510_i80.c \
+Drivers/EXDRV/Src/hx8357a_i80.c \
 Src/system_stm32f4xx.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \

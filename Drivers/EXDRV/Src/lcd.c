@@ -146,14 +146,16 @@ void lcd_probe(void)
 {
 	resource = &__lcd_info_begin;
 	while(resource < &__lcd_info_end) {
-		if(resource->probe==NULL) continue;
-		if(resource->probe() == 0) {
+		if(resource->probe && resource->probe() == 0) {
 			break;
 		}
+		resource++;
 	}
 	assert(resource >= &__lcd_info_end);
 	lcd_init();
 	lcd_set_direction(SET_ROTATE_0);
+	
+	lcd_set_window(0, 0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	lcd_clear_window(COLOR_BLACK);
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 	printf("\nlcd initial done lcd id = 0x%x\n", resource->info->lcd_id);
