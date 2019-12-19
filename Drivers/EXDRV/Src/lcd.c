@@ -153,13 +153,8 @@ void lcd_probe(void)
 	}
 	assert(resource >= &__lcd_info_end);
 	lcd_init();
-	// lcd_wr_reg(0x1100);
-	// __delay_ms(360);
-	// lcd_wr_reg(0x2900);
-	// lcd_wr_reg(0x2c00);
-	// __delay_ms(50);
 	lcd_set_direction(SET_ROTATE_0);
-	lcd_clear_window(0xF800);
+	lcd_clear_window(COLOR_BLACK);
 	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 	printf("\nlcd initial done lcd id = 0x%x\n", resource->info->lcd_id);
 	printf("display window %dx%d\n", LCD_DISPHIG, LCD_DISPWID);

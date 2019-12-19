@@ -4,6 +4,7 @@
 
 #include "stdint.h"
 #include "stdbool.h"
+#include "color.h"
 
 #define USE_LCD_NT35510 1
 
@@ -71,13 +72,13 @@ extern lcd_resources_t __lcd_info_begin;
 extern lcd_resources_t __lcd_info_end;
 
 
-#define __delay_us(n) // HAL_Delay(n)
+#define __delay_us(n) do{uint32_t __delay_us_n=n; while(__delay_us_n--) asm("nop");}while(0);// HAL_Delay(n)
 #define __delay_ms(n) HAL_Delay(n)
 
 #define lcd_read() (LCD_BASE->GRAM)
 #define lcd_wr_reg(r) do{LCD_BASE->REG=r;}while(0)
 #define lcd_wr_data(d) do{LCD_BASE->GRAM=d;}while(0)
-#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);asm("nop");lcd_wr_data(d);}while(0)
+#define lcd_reg_opw(r,d) do{lcd_wr_reg(r);lcd_wr_data(d);}while(0)
 #define lcd_reg_opr(r,p,s) do {\
 		uint16_t size = s; \
 		uint16_t *__tmp_p = p;\

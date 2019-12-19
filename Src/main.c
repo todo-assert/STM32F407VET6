@@ -170,14 +170,18 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK; // RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     Error_Handler();
+  }
+  if (HAL_GetREVID() == 0x1001)
+  {
+    __HAL_FLASH_PREFETCH_BUFFER_ENABLE();
   }
 }
 
@@ -336,14 +340,16 @@ static void MX_FSMC_Init(void)
   hsram1.Init.AsynchronousWait = FSMC_ASYNCHRONOUS_WAIT_DISABLE;
   hsram1.Init.WriteBurst = FSMC_WRITE_BURST_DISABLE;
   hsram1.Init.PageSize = FSMC_PAGE_SIZE_NONE;
+  hsram1.Init.ContinuousClock=FSMC_CONTINUOUS_CLOCK_SYNC_ASYNC;
   /* Timing */
-  Timing.AddressSetupTime = 0; // 15;
-  Timing.AddressHoldTime = 0; // 15;
-  Timing.DataSetupTime = 0; // 255;
-  Timing.BusTurnAroundDuration = 0; // 15;
-  Timing.CLKDivision = 0; // 16;
-  Timing.DataLatency = 0; // 17;
+  Timing.AddressSetupTime = 2; // 15;
+  Timing.AddressHoldTime = 2; // 15;
+  Timing.DataSetupTime = 3; // 255;
+  Timing.BusTurnAroundDuration = 2; // 15;
+  Timing.CLKDivision = 1; // 16;
+  Timing.DataLatency = 2; // 17;
   Timing.AccessMode = FSMC_ACCESS_MODE_A;
+  
   /* ExtTiming */
 
   if (HAL_SRAM_Init(&hsram1, &Timing, &Timing) != HAL_OK)
