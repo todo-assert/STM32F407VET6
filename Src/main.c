@@ -91,6 +91,7 @@ int _write(int fd, char *ptr, int len)
   * @brief  The application entry point.
   * @retval int
   */
+uint8_t *rom_file;
 int main(void)
 {
   uint16_t i;
@@ -130,6 +131,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  extern uint8_t from_file[];
+  rom_file = from_file;
+  nes_main();
   while (1)
   {
     /* USER CODE END WHILE */

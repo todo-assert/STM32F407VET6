@@ -115,7 +115,13 @@ Middlewares/Third_Party/LibJPEG/source/jaricom.c \
 Middlewares/Third_Party/LibJPEG/source/jerror.c \
 Middlewares/Third_Party/LibJPEG/source/jmemmgr.c \
 Middlewares/Third_Party/LibJPEG/source/jutils.c \
-Middlewares/Third_Party/LibJPEG/source/jmemnobs.c  
+Middlewares/Third_Party/LibJPEG/source/jmemnobs.c \
+Middlewares/Third_Party/NES/6502.c \
+Middlewares/Third_Party/NES/nes_joypad.c \
+Middlewares/Third_Party/NES/nes_main.c \
+Middlewares/Third_Party/NES/nes_rom.c \
+Middlewares/Third_Party/NES/PPU.c \
+# Middlewares/Third_Party/NES/rom_mario.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -179,6 +185,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IMiddlewares/Third_Party/FatFs/src \
 -IMiddlewares/Third_Party/LibJPEG/include \
+-IMiddlewares/Third_Party/NES \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Include \
