@@ -57,10 +57,17 @@ uint16_t lcd_read_data(void)
 void lcd_set_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
 	if(LCD_XCURSOR && LCD_YCURSOR) {
-		lcd_reg_opw(LCD_XCURSOR+0, x0>>8);
-		lcd_reg_opw(LCD_XCURSOR+1, x0&0xff);
-		lcd_reg_opw(LCD_YCURSOR+0, y0>>8);
-		lcd_reg_opw(LCD_YCURSOR+1, y0&0xff);
+		if(lcd->dir == SET_ROTATE_0 || lcd->dir == SET_ROTATE_180) {
+			lcd_reg_opw(LCD_XCURSOR+0, x0>>8);
+			lcd_reg_opw(LCD_XCURSOR+1, x0&0xff);
+			lcd_reg_opw(LCD_YCURSOR+0, y0>>8);
+			lcd_reg_opw(LCD_YCURSOR+1, y0&0xff);
+		} else {
+			lcd_reg_opw(LCD_YCURSOR+0, x0>>8);
+			lcd_reg_opw(LCD_YCURSOR+1, x0&0xff);
+			lcd_reg_opw(LCD_XCURSOR+0, y0>>8);
+			lcd_reg_opw(LCD_XCURSOR+1, y0&0xff);			
+		}
 	}
 	lcd_reg_opw((LCD_SETXCMD+0), x0>>8);
 	lcd_reg_opw((LCD_SETXCMD+1), x0&0xff);
@@ -76,10 +83,17 @@ void lcd_set_window(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 void lcd_set_cursor(uint16_t x0, uint16_t y0) 
 {
 	if(LCD_XCURSOR && LCD_YCURSOR) {
-		lcd_reg_opw(LCD_XCURSOR+0, x0>>8);
-		lcd_reg_opw(LCD_XCURSOR+1, x0&0xff);
-		lcd_reg_opw(LCD_YCURSOR+0, y0>>8);
-		lcd_reg_opw(LCD_YCURSOR+1, y0&0xff);
+		if(lcd->dir == SET_ROTATE_0 || lcd->dir == SET_ROTATE_180) {
+			lcd_reg_opw(LCD_XCURSOR+0, x0>>8);
+			lcd_reg_opw(LCD_XCURSOR+1, x0&0xff);
+			lcd_reg_opw(LCD_YCURSOR+0, y0>>8);
+			lcd_reg_opw(LCD_YCURSOR+1, y0&0xff);
+		} else {
+			lcd_reg_opw(LCD_YCURSOR+0, x0>>8);
+			lcd_reg_opw(LCD_YCURSOR+1, x0&0xff);
+			lcd_reg_opw(LCD_XCURSOR+0, y0>>8);
+			lcd_reg_opw(LCD_XCURSOR+1, y0&0xff);			
+		}
 		lcd_ram_preparew();
 	} else {
 		lcd_set_window(x0, y0, LCD_DISPWID, LCD_DISPHIG);
@@ -89,6 +103,7 @@ void lcd_set_cursor(uint16_t x0, uint16_t y0)
 
 void lcd_set_direction(direction_set_t dir)
 {
+	lcd->dir = dir;
 	switch(dir) {
 		case SET_ROTATE_0:
 			LCD_DISPWID=LCD_WIDTH;
@@ -103,12 +118,12 @@ void lcd_set_direction(direction_set_t dir)
 		case SET_ROTATE_180:
 			LCD_DISPWID=LCD_WIDTH;
 			LCD_DISPHIG=LCD_HIGHT;
-			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_RIGHT);
+			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_DOWN);
 			break;
 		case SET_ROTATE_270:
 			LCD_DISPWID=LCD_HIGHT;
 			LCD_DISPHIG=LCD_WIDTH;
-			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_DOWN);
+			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_RIGHT);
 			break;
 		default: break;
 	}
@@ -164,7 +179,7 @@ lcd_class_t *lcd_probe(void)
 	}
 	assert(lcd->resource >= &__lcd_info_end);
 	lcd_init();
-	lcd_set_direction(SET_ROTATE_0);
+	lcd_set_direction(SET_ROTATE_90);
 	
 	lcd_set_window(0, 0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	lcd_clear_window(COLOR_BLACK);

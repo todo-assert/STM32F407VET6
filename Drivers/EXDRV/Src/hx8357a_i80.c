@@ -98,7 +98,7 @@ const reg_map_t hx8357a_reg_map[1] = {
 	}
 };
 
-lcd_info_t hx8357a_disp_info[1] = {
+const lcd_info_t hx8357a_disp_info[1] = {
 	{
 		.lcd_width = 320,
 		.lcd_hight = 480,
@@ -106,9 +106,9 @@ lcd_info_t hx8357a_disp_info[1] = {
 		.direction_reg = 0x16,
 		{
 			.direction_up = 0x48,
-			.direction_left = 0x48,
-			.direction_down = 0x48,
-			.direction_right = 0x48,
+			.direction_left = 0x28,
+			.direction_down = 0x88,
+			.direction_right = 0xe8,
 		},
 	},
 };

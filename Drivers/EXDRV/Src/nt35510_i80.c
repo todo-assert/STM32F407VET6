@@ -456,7 +456,7 @@ const reg_map_t nt35510_reg_map[1] = {
 	}
 };
 
-lcd_info_t nt35510_disp_info[1] = {
+const lcd_info_t nt35510_disp_info[1] = {
 	{
 		.lcd_width = 480,
 		.lcd_hight = 800,
