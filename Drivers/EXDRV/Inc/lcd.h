@@ -61,7 +61,7 @@ typedef struct {
 	const reg_array_t *array;
 	uint32_t array_length;
 	const reg_map_t *map;
-	lcd_info_t *info;
+	const lcd_info_t *info;
 	int (*probe) (void);
 }lcd_resources_t;
 
@@ -83,6 +83,7 @@ typedef struct {
 	uint16_t (*get_point)(void);
 	uint16_t disp_width;
 	uint16_t disp_hight;
+	direction_set_t dir;
 }lcd_class_t;
 
 extern lcd_class_t *lcd_probe(void);
