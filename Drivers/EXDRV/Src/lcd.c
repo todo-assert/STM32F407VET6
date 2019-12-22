@@ -7,29 +7,24 @@
 #include "main.h"
 #include "lcd.h"
 
-static lcd_resources_t *resource = NULL;
+lcd_class_t lcd[1];
 
-#define LCD_WRAMCMD	resource->map->lcd_wramcmd
-#define LCD_RRAMCMD	resource->map->lcd_rramcmd
-#define LCD_SETXCMD resource->map->lcd_setxcmd
-#define LCD_SETYCMD resource->map->lcd_setycmd
-#define LCD_XCURSOR	resource->map->lcd_xcursor
-#define LCD_YCURSOR	resource->map->lcd_ycursor
-#define LCD_DISPWID resource->info->disp_width
-#define LCD_DISPHIG resource->info->disp_hight
+#define LCD_WRAMCMD	lcd->resource->map->lcd_wramcmd
+#define LCD_RRAMCMD	lcd->resource->map->lcd_rramcmd
+#define LCD_SETXCMD lcd->resource->map->lcd_setxcmd
+#define LCD_SETYCMD lcd->resource->map->lcd_setycmd
+#define LCD_XCURSOR	lcd->resource->map->lcd_xcursor
+#define LCD_YCURSOR	lcd->resource->map->lcd_ycursor
+#define LCD_DISPWID lcd->disp_width
+#define LCD_DISPHIG lcd->disp_hight
+#define LCD_WIDTH lcd->resource->info->lcd_width
+#define LCD_HIGHT lcd->resource->info->lcd_hight
 
-#define LCD_DIR_REG resource->info->direction_reg
-#define LCD_DIR_UP resource->info->direction_up
-#define LCD_DIR_LEFT resource->info->direction_left
-#define LCD_DIR_RIGHT resource->info->direction_right
-#define LCD_DIR_DOWN resource->info->direction_down
-
-typedef enum {
-	SET_ROTATE_0 = 0,
-	SET_ROTATE_90,
-	SET_ROTATE_180,
-	SET_ROTATE_270
-}direction_set_t;
+#define LCD_DIR_REG lcd->resource->info->direction_reg
+#define LCD_DIR_UP lcd->resource->info->direction_up
+#define LCD_DIR_LEFT lcd->resource->info->direction_left
+#define LCD_DIR_RIGHT lcd->resource->info->direction_right
+#define LCD_DIR_DOWN lcd->resource->info->direction_down
 
 typedef union {
 	uint16_t data;
@@ -96,23 +91,23 @@ void lcd_set_direction(direction_set_t dir)
 {
 	switch(dir) {
 		case SET_ROTATE_0:
-			resource->info->disp_width=resource->info->lcd_width;
-			resource->info->disp_hight=resource->info->lcd_hight;
+			LCD_DISPWID=LCD_WIDTH;
+			LCD_DISPHIG=LCD_HIGHT;
 			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_UP);
 			break;
 		case SET_ROTATE_90:
-			resource->info->disp_width=resource->info->lcd_hight;
-			resource->info->disp_hight=resource->info->lcd_width;
+			LCD_DISPWID=LCD_HIGHT;
+			LCD_DISPHIG=LCD_WIDTH;
 			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_LEFT);
 			break;
 		case SET_ROTATE_180:
-			resource->info->disp_width=resource->info->lcd_width;
-			resource->info->disp_hight=resource->info->lcd_hight;
+			LCD_DISPWID=LCD_WIDTH;
+			LCD_DISPHIG=LCD_HIGHT;
 			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_RIGHT);
 			break;
 		case SET_ROTATE_270:
-			resource->info->disp_width=resource->info->lcd_hight;
-			resource->info->disp_hight=resource->info->lcd_width;
+			LCD_DISPWID=LCD_HIGHT;
+			LCD_DISPHIG=LCD_WIDTH;
 			lcd_reg_opw(LCD_DIR_REG, LCD_DIR_DOWN);
 			break;
 		default: break;
@@ -129,37 +124,54 @@ void lcd_clear_window(uint16_t color)
 	}
 }
 
+void lcd_set_backlight(unsigned char duty)
+{
+	if(!duty) {
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+	} else {
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+	}
+}
+
 void lcd_init(void)
 {
 	uint16_t i=0;
-	const reg_array_t *array = resource->array;
-	for(i=0;i<resource->array_length;i++) {
+	const reg_array_t *array = lcd->resource->array;
+	for(i=0;i<lcd->resource->array_length;i++) {
 		if(array[i].flag == DELAY_INSERT_FLAG) {
 			__delay_ms(array[i].value);
 		} else {
 			lcd_reg_opw(array[i].reg, array[i].data);
 		}
 	}
+	lcd->base = LCD_BASE;
+	lcd->set_window = lcd_set_window;
+	lcd->set_cursor = lcd_set_cursor;
+	lcd->set_direction = lcd_set_direction;
+	lcd->clear_window = lcd_clear_window;
+	lcd->get_point = lcd_read_data;
+	lcd->set_backlight = lcd_set_backlight;
 }
 
-void lcd_probe(void)
+lcd_class_t *lcd_probe(void)
 {
-	resource = &__lcd_info_begin;
-	while(resource < &__lcd_info_end) {
-		if(resource->probe && resource->probe() == 0) {
+	lcd->resource = &__lcd_info_begin;
+	while(lcd->resource < &__lcd_info_end) {
+		if(lcd->resource->probe && lcd->resource->probe() == 0) {
 			break;
 		}
-		resource++;
+		lcd->resource++;
 	}
-	assert(resource >= &__lcd_info_end);
+	assert(lcd->resource >= &__lcd_info_end);
 	lcd_init();
 	lcd_set_direction(SET_ROTATE_0);
 	
 	lcd_set_window(0, 0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	lcd_clear_window(COLOR_BLACK);
-	HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-	printf("\nlcd initial done lcd id = 0x%x\n", resource->info->lcd_id);
+	lcd_set_backlight(100);
+	printf("\nlcd initial done lcd id = 0x%x\n", lcd->resource->info->lcd_id);
 	printf("display window %dx%d\n", LCD_DISPHIG, LCD_DISPWID);
+	return lcd;
 }
 
 

@@ -460,8 +460,6 @@ lcd_info_t nt35510_disp_info[1] = {
 	{
 		.lcd_width = 480,
 		.lcd_hight = 800,
-		.disp_width = 480,
-		.disp_hight = 800,
 		.lcd_id = 0x5510,
 		.direction_reg = 0x3600,
 		{

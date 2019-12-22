@@ -47,8 +47,6 @@ typedef struct {
 typedef struct {
 	uint16_t lcd_width;
 	uint16_t lcd_hight;
-	uint16_t disp_width;
-	uint16_t disp_hight;
 	uint16_t lcd_id;
 	uint16_t direction_reg;
 	struct {
@@ -67,8 +65,27 @@ typedef struct {
 	int (*probe) (void);
 }lcd_resources_t;
 
-extern void lcd_probe(void);
-extern void lcd_clear_window(uint16_t color);
+typedef enum {
+	SET_ROTATE_0 = 0,
+	SET_ROTATE_90,
+	SET_ROTATE_180,
+	SET_ROTATE_270
+}direction_set_t;
+
+typedef struct {
+	lcd_resources_t *resource;
+	volatile lcd_base *base;
+	void (*set_window)(uint16_t, uint16_t, uint16_t, uint16_t );
+	void (*set_cursor)(uint16_t, uint16_t );
+	void (*set_direction)(direction_set_t );
+	void (*set_backlight)(unsigned char );
+	void (*clear_window)(uint16_t );
+	uint16_t (*get_point)(void);
+	uint16_t disp_width;
+	uint16_t disp_hight;
+}lcd_class_t;
+
+extern lcd_class_t *lcd_probe(void);
 
 extern lcd_resources_t __lcd_info_begin;
 extern lcd_resources_t __lcd_info_end;

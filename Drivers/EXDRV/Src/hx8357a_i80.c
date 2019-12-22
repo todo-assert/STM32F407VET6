@@ -102,8 +102,6 @@ lcd_info_t hx8357a_disp_info[1] = {
 	{
 		.lcd_width = 320,
 		.lcd_hight = 480,
-		.disp_width = 320,
-		.disp_hight = 480,
 		.lcd_id = 0x57,
 		.direction_reg = 0x16,
 		{

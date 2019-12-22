@@ -94,6 +94,7 @@ int _write(int fd, char *ptr, int len)
 int main(void)
 {
   uint16_t i;
+  lcd_class_t *lcd;
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -120,7 +121,7 @@ int main(void)
   MX_FSMC_Init();
   MX_USART1_UART_Init();
   printf("\n\nInitial\n");
-  lcd_probe();
+  lcd = lcd_probe();
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
@@ -133,7 +134,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
     for(i=0;i<0xFFFF;i++) {
-      lcd_clear_window(i);	
+      // lcd->clear_window(i);
+	  // lcd->set_cursor(0,0);
+      lcd->base->GRAM = i;
     }
     /* USER CODE BEGIN 3 */
   }
@@ -301,7 +304,7 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed=GPIO_SPEED_HIGH;
   HAL_GPIO_Init(GPIOD,&GPIO_InitStruct); 
   
-  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_RESET);
   
   HAL_GPIO_WritePin(GPIOD,GPIO_PIN_6,GPIO_PIN_RESET);
   HAL_Delay(300);
