@@ -27,7 +27,7 @@ typedef struct
 						// D1£º1£½ÓĞµç³Ø¼ÇÒä£¬SRAMµØÖ·$6000-$7FFF
 						// D2£º1£½ÔÚ$7000-$71FFÓĞÒ»¸ö512×Ö½ÚµÄtrainer 
 						// D3£º1£½4ÆÁÄ»VRAM²¼¾Ö 
-						//  D4£­D7£ºROM MapperµÄÍ4» 	  
+						//  D4£­D7£ºROM MapperµÄ??	  
 	uint8_t rommappernum;	// D0£­D3£º±£Áô£¬±ØĞëÊÇ0£¨×¼±¸×÷Îª¸±MapperºÅ^_^£©
 						// D4£­D7£ºROM MapperµÄ¸ß4Î» 		    
 	//uint8_t reserve[8];	// ±£Áô£¬±ØĞëÊÇ0 					    
@@ -35,6 +35,7 @@ typedef struct
 	//VROM¶Î, ÉıĞòÅÅÁĞ 
 }NesHeader;																		 
 
+extern int scaler_init(uint16_t disp_width, uint16_t disp_hight);
 uint8_t nes_main(void);
 void NesFrameCycle(void);
 void NES_ReadJoyPad(uint8_t JoyPadNum);

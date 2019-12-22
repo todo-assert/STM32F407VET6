@@ -11,7 +11,7 @@
 ////////////////////////////////////////////////////////////////////////////////// 	   
 #include "stdint.h"
 
-extern uint8_t  *rom_file;//NES游戏rom的存储地址 		    
+extern uint8_t  rom_file[];//NES游戏rom的存储地址 		    
 #endif
 
 

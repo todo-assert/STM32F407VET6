@@ -23,6 +23,7 @@
 #include "lcd.h"
 #include "fatfs.h"
 #include "libjpeg.h"
+#include "nes_main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -56,7 +57,7 @@ SRAM_HandleTypeDef hsram1;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_FSMC_Init(void);
+static void MX_FSMC_Init(bool );
 static void MX_USB_OTG_FS_USB_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
@@ -91,7 +92,6 @@ int _write(int fd, char *ptr, int len)
   * @brief  The application entry point.
   * @retval int
   */
-uint8_t *rom_file;
 int main(void)
 {
   uint16_t i;
@@ -119,10 +119,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_FSMC_Init();
+  MX_FSMC_Init(true);
   MX_USART1_UART_Init();
   printf("\n\nInitial\n");
   lcd = lcd_probe();
+  MX_FSMC_Init(false);
   MX_USB_OTG_FS_USB_Init();
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
@@ -131,8 +132,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  extern uint8_t from_file[];
-  rom_file = from_file;
+  scaler_init(lcd->disp_width, lcd->disp_hight);
   nes_main();
   while (1)
   {
@@ -318,7 +318,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* FSMC initialization function */
-static void MX_FSMC_Init(void)
+static void MX_FSMC_Init(bool init)
 {
 
   /* USER CODE BEGIN FSMC_Init 0 */
@@ -352,12 +352,21 @@ static void MX_FSMC_Init(void)
   hsram1.Init.PageSize = FSMC_PAGE_SIZE_NONE;
   hsram1.Init.ContinuousClock=FSMC_CONTINUOUS_CLOCK_SYNC_ASYNC;
   /* Timing */
-  Timing.AddressSetupTime = 4; // 15;
-  Timing.AddressHoldTime = 4; // 15;
-  Timing.DataSetupTime = 4; // 255;
-  Timing.BusTurnAroundDuration = 4; // 15;
-  Timing.CLKDivision = 2; // 16;
-  Timing.DataLatency = 2; // 17;
+  if(init) {
+	  Timing.AddressSetupTime = 4; // 15;
+	  Timing.AddressHoldTime = 4; // 15;
+	  Timing.DataSetupTime = 4; // 255;
+	  Timing.BusTurnAroundDuration = 4; // 15;
+	  Timing.CLKDivision = 2; // 16;
+	  Timing.DataLatency = 2; // 17;
+  } else {
+	  Timing.AddressSetupTime = 2; // 15;
+	  Timing.AddressHoldTime = 2; // 15;
+	  Timing.DataSetupTime = 2; // 255;
+	  Timing.BusTurnAroundDuration = 2; // 15;
+	  Timing.CLKDivision = 1; // 16;
+	  Timing.DataLatency = 1; // 17;
+  } 
   Timing.AccessMode = FSMC_ACCESS_MODE_A;
   
   /* ExtTiming */

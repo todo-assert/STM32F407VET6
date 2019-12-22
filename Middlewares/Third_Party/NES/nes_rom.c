@@ -1,7 +1,8 @@
 #include "nes_rom.h"
 
+#include "rom_mario.c"
 #define _USE_BIGTANK_  		0  	//使用导弹坦克nes
-#define _USE_SUPPERMARIO_ 	1  	//超级玛丽
+#define _USE_SUPPERMARIO_ 	0  	//超级玛丽
 
 #if _USE_SUPPERMARIO_ == 1 
 const unsigned char from_file[40976]=

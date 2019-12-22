@@ -1,4 +1,3 @@
-#include "rom.h"
 
 unsigned char rom_file[40976] =
 {

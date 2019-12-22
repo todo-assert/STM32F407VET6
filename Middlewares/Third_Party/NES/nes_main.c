@@ -84,38 +84,38 @@ uint8_t nes_main(void)
 	//所以使用strcncmp比较前3个字节。   
 	if(strncmp(neshreader->filetype, "NES", 3) != 0)
 	{
-		printf("\r\n文件未加载或文件类型错误, NES模拟器退出。");
+		// printf("\r\n文件未加载或文件类型错误, NES模拟器退出。");
 		return 1;
 	}else
 	{
-		printf("\r\n文件加载完成。");
-		printf("\r\n  16kB  ROM 的数目: %d", neshreader->romnum);
-		printf("\r\n   8kB VROM 的数目: %d", neshreader->vromnum);
+		// printf("\r\n文件加载完成。");
+		// printf("\r\n  16kB  ROM 的数目: %d", neshreader->romnum);
+		// printf("\r\n   8kB VROM 的数目: %d", neshreader->vromnum);
 		if((neshreader->romfeature & 0x01) == 0){
-			printf("\r\n  水平镜像");
+			// printf("\r\n  水平镜像");
 		}else{
-	 		printf("\r\n  垂直镜像");
+	 		// printf("\r\n  垂直镜像");
 		}
 
 		if((neshreader->romfeature & 0x02) == 0){
-			printf("\r\n  无记忆SRAM");
+			// printf("\r\n  无记忆SRAM");
 		}else{
-	 		printf("\r\n  有记忆SRAM");
+	 		// printf("\r\n  有记忆SRAM");
 		}
 
 		if((neshreader->romfeature & 0x04) == 0)
 		{
-			printf("\r\n  无512字节的trainer($7000-$71FF)");
+			// printf("\r\n  无512字节的trainer($7000-$71FF)");
 		}else
 		{
 			offset=512;
-	 		printf("\r\n  有512字节的trainer(ROM格式暂不支持)");
+	 		// printf("\r\n  有512字节的trainer(ROM格式暂不支持)");
 		}
 
 		if((neshreader->romfeature & 0x08) == 0){
-			printf("\r\n  2屏幕VRAM布局");
+			// printf("\r\n  2屏幕VRAM布局");
 		}else{
-	 		printf("\r\n  4屏幕VRAM布局(暂不支持)");
+	 		// printf("\r\n  4屏幕VRAM布局(暂不支持)");
 		}
 
 		printf("\r\n  iNES Mapper Numbers: %d", (neshreader->rommappernum & 0xF0)|( neshreader->romfeature >> 4));

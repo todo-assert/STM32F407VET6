@@ -1,4 +1,5 @@
 #include "nes_main.h"
+#include "stdlib.h"
 #include "lcd.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //参考自网友:xiaowei061的NES模拟器，再此对xiaowei061表示感谢！
@@ -18,6 +19,9 @@ PPU_RegType PPU_Reg;
 PPU_MemType PPU_Mem;	  
 Spr_MemType	Spr_Mem;
 SpriteType  *sprite = (SpriteType*)&Spr_Mem.spr_ram[0]; //指向第一个sprite 0 的位置
+
+uint16_t *zoom_x_tab = NULL;
+uint16_t *zoom_y_tab = NULL;
 
 // 显示相关 
 uint8_t 	SpriteHitFlag, PPU_Latch_Flag; 	//sprite #0 显示碰撞点所在扫描行号, 背景位移￥2005写入标志 
@@ -642,16 +646,70 @@ void NES_RenderLine(int y_axes)
 	NES_LCD_DisplayLine(y_axes, Buffer_scanline);		 //启动LCD显示一行，查询或DMA传送
 }
 
+#define NES_DISP_WIDTH_BLANK 8
+#define NES_SHOW_WIDTH (256-NES_DISP_WIDTH_BLANK)
+#define NES_SHOW_HEIGHT (240)
+static uint16_t line;
+
+int scaler_init(uint16_t disp_width, uint16_t disp_hight)
+{
+	if(zoom_x_tab) free(zoom_x_tab);
+	if(zoom_y_tab) free(zoom_y_tab);
+	int i;
+	zoom_x_tab = (uint16_t *)malloc(sizeof(uint16_t) * disp_width);
+	if(NULL == zoom_x_tab)
+	{
+		printf("make zoom_x_tab error\n");
+		return -1;
+	}
+	for(i=0; i<disp_width; i++)
+	{
+		zoom_x_tab[i] = (i+0.4999999)*NES_SHOW_WIDTH/disp_width-0.5;
+		// printf("%d ", zoom_x_tab[i]);
+	}
+	zoom_y_tab = (uint16_t *)malloc(sizeof(uint16_t) * disp_hight);
+	// printf("\n");
+	if(NULL == zoom_y_tab)
+	{
+		printf("make zoom_y_tab error\n");
+		return -1;
+	}
+	for(i=0; i<disp_hight; i++)
+	{
+		zoom_y_tab[i] = (i+0.4999999)*NES_SHOW_HEIGHT/disp_hight-0.5;
+		// printf("%d ", zoom_y_tab[i]);
+	}
+	// printf("\n");
+	return 0;
+}
+
 //PPU 将行缓存，写入LCD	
 //NES游戏的分辨率为256*240.	 
 void NES_LCD_DisplayLine(int y_axes, uint16_t *Disaplyline_buffer)
 {
 	uint32_t index;		 			  
- 	lcd->set_cursor(0,y_axes+30+20);//偏移到中间
- 	// LCD_WriteRAM_Prepare();
-	for(index = 16; index < 256; index++)
-	{
-		LCD_BASE->GRAM = Buffer_scanline[index];
+ 	// lcd->set_cursor(0,y_axes+30+20);//偏移到中间
+	uint16_t scaler, repeat;
+	if(y_axes == 0) {
+		line = 0;
 	}
+	scaler = zoom_y_tab[line];
+	repeat = line;
+	while((scaler==zoom_y_tab[line++]) && (line < lcd->disp_hight));
+	if(repeat<line+1) line--;
+	uint16_t *fb = &Buffer_scanline[NES_DISP_WIDTH_BLANK];
+	for(;repeat<line;repeat++) {
+		lcd->set_cursor(0, repeat);//偏移到中间
+		for(index=0;index<lcd->disp_width;index++) {
+			LCD_BASE->GRAM = fb[zoom_x_tab[index]];
+		}
+	}
+ 	// LCD_WriteRAM_Prepare();
+	// for(index = 16; index < 256; index++)
+	// (256 - 8) x 240
+	// for(index = 8; index < 256; index++)
+	// {
+		// LCD_BASE->GRAM = Buffer_scanline[index];
+	// }
 } 
 
