@@ -23,6 +23,7 @@
 #include "lcd.h"
 #include "fatfs.h"
 #include "libjpeg.h"
+#include "lvgl_display.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -126,6 +127,8 @@ int main(void)
   MX_FATFS_Init();
   MX_LIBJPEG_Init();
   /* USER CODE BEGIN 2 */
+  lvgl_dispaly_register(lcd);
+  lvgl_main(0, NULL);
   /* USER CODE END 2 */
 
   /* Infinite loop */
