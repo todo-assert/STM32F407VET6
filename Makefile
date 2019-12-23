@@ -65,6 +65,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c \
 Drivers/EXDRV/Src/lcd.c \
 Drivers/EXDRV/Src/nt35510_i80.c \
 Drivers/EXDRV/Src/hx8357a_i80.c \
+Drivers/HAL_LVGL/Src/lvgl_display.c \
+Drivers/HAL_LVGL/Src/lvgl_main.c \
 Src/system_stm32f4xx.c \
 Middlewares/Third_Party/FatFs/src/diskio.c \
 Middlewares/Third_Party/FatFs/src/ff.c \
@@ -116,6 +118,13 @@ Middlewares/Third_Party/LibJPEG/source/jerror.c \
 Middlewares/Third_Party/LibJPEG/source/jmemmgr.c \
 Middlewares/Third_Party/LibJPEG/source/jutils.c \
 Middlewares/Third_Party/LibJPEG/source/jmemnobs.c  
+
+LVGL_DIR=Middlewares/Third_Party
+include $(LVGL_DIR)/lvgl/lvgl.mk
+C_SOURCES += $(CSRCS)
+
+$(shell [ ! -z `grep -rn "#if LV_HOR_RES_MAX"  $(LVGL_DIR)/lvgl/src/lv_core/lv_obj.h` ] && sed -i s/'#if LV_HOR_RES_MAX.*'/'#if 0'/g $(LVGL_DIR)/lvgl/src/lv_core/lv_obj.h)
+
 
 # ASM sources
 ASM_SOURCES =  \
@@ -182,7 +191,9 @@ C_INCLUDES =  \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
 -IDrivers/CMSIS/Include \
--IDrivers/EXDRV/Inc
+-IDrivers/EXDRV/Inc \
+-IDrivers/HAL_LVGL/Inc \
+-IMiddlewares/Third_Party
 
 
 # compile gcc flags
