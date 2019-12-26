@@ -10,7 +10,7 @@ static uint32_t tick = 0;
 
 void HAL_IncTick(void)
 {
-	if(tick++ == 0xff)
+	if(tick++ == 0xf)
 		lv_task_handler();
 	uwTick += uwTickFreq;
 }
@@ -82,8 +82,8 @@ void demo_create(void)
     lv_obj_t * tv = lv_tabview_create(lv_disp_get_scr_act(NULL), NULL);
     lv_obj_set_size(tv, hres, vres);
 
-    lv_obj_t * tab1 = lv_tabview_add_tab(tv, "Write");
     lv_obj_t * tab2 = lv_tabview_add_tab(tv, "List");
+    lv_obj_t * tab1 = lv_tabview_add_tab(tv, "Write");
     lv_obj_t * tab3 = lv_tabview_add_tab(tv, "Chart");
 
     lv_tabview_set_style(tv, LV_TABVIEW_STYLE_BTN_BG, &style_tv_btn_bg);
