@@ -22,12 +22,12 @@ static void hal_init(void)
 	uint32_t size = lvgl_display->disp_width*10;
 	buf = (lv_color_t *)malloc(size);
 	lv_disp_buf_init(&disp_buf, buf, NULL, size);
-    /*Create a display*/
-    lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-    disp_drv.buffer = &disp_buf;
-    disp_drv.flush_cb = lvgl_dispaly_flush;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
-    lv_disp_drv_register(&disp_drv);
+	/*Create a display*/
+	lv_disp_drv_t disp_drv;
+	lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+	disp_drv.buffer = &disp_buf;
+	disp_drv.flush_cb = lvgl_dispaly_flush;    /*Used when `LV_VDB_SIZE != 0` in lv_conf.h (buffered drawing)*/
+	lv_disp_drv_register(&disp_drv);
 }
 
 // demo
@@ -97,6 +97,7 @@ void demo_create(void)
     list_create(tab2);
     chart_create(tab3);
 }
+
 static void write_create(lv_obj_t * parent)
 {
     lv_page_set_style(parent, LV_PAGE_STYLE_BG, &lv_style_transp_fit);
