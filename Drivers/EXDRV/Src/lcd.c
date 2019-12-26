@@ -170,6 +170,7 @@ void lcd_init(void)
 
 lcd_class_t *lcd_probe(void)
 {
+	lcd_set_backlight(0);
 	lcd->resource = &__lcd_info_begin;
 	while(lcd->resource < &__lcd_info_end) {
 		if(lcd->resource->probe && lcd->resource->probe() == 0) {
@@ -183,6 +184,7 @@ lcd_class_t *lcd_probe(void)
 	
 	lcd_set_window(0, 0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	lcd_clear_window(COLOR_BLACK);
+	__delay_ms(500);
 	lcd_set_backlight(100);
 	printf("\nlcd initial done lcd id = 0x%x\n", lcd->resource->info->lcd_id);
 	printf("display window %dx%d\n", LCD_DISPHIG, LCD_DISPWID);
