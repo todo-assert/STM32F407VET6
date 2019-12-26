@@ -142,7 +142,7 @@ void lcd_clear_window(uint16_t color)
 void lcd_set_backlight(unsigned char duty)
 {
 	if(!duty) {
-		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_RESET);
 	} else {
 		HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
 	}
@@ -184,7 +184,7 @@ lcd_class_t *lcd_probe(void)
 	
 	lcd_set_window(0, 0, LCD_DISPWID-1, LCD_DISPHIG-1);
 	lcd_clear_window(COLOR_BLACK);
-	__delay_ms(500);
+	__delay_ms(200);
 	lcd_set_backlight(100);
 	printf("\nlcd initial done lcd id = 0x%x\n", lcd->resource->info->lcd_id);
 	printf("display window %dx%d\n", LCD_DISPHIG, LCD_DISPWID);
